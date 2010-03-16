@@ -7,15 +7,26 @@ public class StoryIndexer {
 	//--------------------------------------------------
 	// CLI stuff
 	//-------------------------------------------------- 
+	Option[] optionArray = {
+	    OptionBuilder.withLongOpt("help").withDescription("Show this help screen").create(),
+	    OptionBuilder.withLongOpt("verbose").withDescription("Show verbose output").create()
+	};
+
 	Options options = new Options();
-	options.addOption("h", false, "Show this help screen");
+	for (Option o: optionArray) options.addOption(o);
 
 	CommandLineParser parser = new GnuParser();
 
 	try {
 	    CommandLine cmd = parser.parse(options, args);
+
+	    if (cmd.hasOption("help")) {
+		HelpFormatter formatter = new HelpFormatter();
+		formatter.printHelp("StoryIndexer [options..] file..", options);
+		return;
+	    }
 	}
-	catch (ParserException e) {
+	catch (ParseException e) {
 	    System.err.println("common-cli: " + e.getMessage());
 	}
     }
