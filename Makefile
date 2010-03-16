@@ -12,7 +12,7 @@ SRC = $(shell find src -name '*.java')
 JC = /usr/bin/javac
 JAR = /usr/bin/jar
 
-JFLAGS = -cp $(CLASSPATH)
+JFLAGS = -cp $(CLASSPATH):src
 BUILD = build
 BUNDLE = ict-terrier.jar
 
