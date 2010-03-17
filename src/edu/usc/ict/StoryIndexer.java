@@ -1,7 +1,11 @@
 package edu.usc.ict;
 
+import org.apache.log4j.Logger;
 import org.apache.commons.cli.*;
-import org.terrier.indexing.CollectionFactory;
+import org.terrier.indexing.*;
+//--------------------------------------------------
+// import org.terrier.utility.ApplicationSetup;
+//-------------------------------------------------- 
 import java.io.*;
 import java.util.zip.GZIPInputStream;
 
@@ -13,7 +17,7 @@ public class StoryIndexer {
 	Option[] optionArray = {
 	    OptionBuilder.withLongOpt("help").withDescription("Show this help screen").create(),
 	    OptionBuilder.withLongOpt("verbose").withDescription("Show verbose output").create(),
-	    OptionBuilder.withLongOpt("index").withArgName("path").hasArgs(1).withDescription("Path to the index").create("i"),
+	    OptionBuilder.withLongOpt("index").withArgName("path").hasArgs(1).withDescription("Path to the index").create(),
 	};
 
 	Options options = new Options();
@@ -31,34 +35,48 @@ public class StoryIndexer {
 		return;
 	    }
 
-	    StoryIndexer indexer = new StoryIndexer(cmd.getOptionValue("index"));
+	    if (!cmd.hasOption("index")) throw new MissingOptionException("Missing option --index");
+
+	    // NOTE: Prefix defaults "ict"
+	    StoryIndexer indexer = new StoryIndexer(cmd.getOptionValue("index", "index.unnamed"), "ict");
 	    indexer.process(filenames);
 	}
-	catch (ParseException e) {
-	    System.err.println("common-cli: " + e.getMessage());
-	}
+	catch (ParseException e) { System.err.println("common-cli: " + e.getMessage()); }
+	catch (Exception e) { e.printStackTrace(); }
     }
+
+    public static final String defaultCollectionClassName = "edu.usc.ict.terrier.Spinn3rCollection";
+    public static final String defaultIndexerClassName = "org.terrier.indexing.BasicSinglePassIndexer";
 
     private String indexPath;
+    private String indexPrefix;
+    private Class<? extends Collection> collectionClass; 
+    private Class<? extends Indexer> indexerClass;
 
-    public StoryIndexer(String indexPath) {
-	this.indexPath = indexPath;
+    public StoryIndexer(String path, String prefix) throws ClassNotFoundException { 
+	this(path, prefix, defaultCollectionClassName, defaultIndexerClassName); 
     }
 
-    public void process(String[] filenames) {
-	for (String filename: filenames) {
-	    try {
-		InputStream in = new GZIPInputStream(new FileInputStream(filename));
-		BufferedReader reader = new BufferedReader(new InputStreamReader(in, "UTF-8"));
-		String line = reader.readLine();
-		while (line != null) {
-		    System.out.println(line);
-		    line = reader.readLine();
-		}
-	    }
-	    catch (FileNotFoundException e) {}
-	    catch (UnsupportedEncodingException e) {}
-	    catch (IOException e) {}
-	}
+    public StoryIndexer(String path, String prefix, String collectionClassName, String indexerClassName) 
+	throws ClassNotFoundException 
+    { 
+	indexPath = path;  
+	indexPrefix = prefix;
+	collectionClass = Class.forName(collectionClassName).asSubclass(Collection.class);
+	indexerClass = Class.forName(indexerClassName).asSubclass(Indexer.class);
+    }
+
+    public void process(String[] filenames) throws NoSuchMethodException, 
+	InstantiationException, IllegalAccessException, java.lang.reflect.InvocationTargetException 
+    {
+	Collection collection = collectionClass.getConstructor(new Class[]{ String[].class })
+	    .newInstance(new Object[]{ filenames });
+
+	System.setProperty("terrier.home", ".");
+	System.setProperty("terrier.var", ".");
+	Indexer indexer = indexerClass.getConstructor(new Class[]{ String.class, String.class })
+	    .newInstance(new Object[]{ indexPath, indexPrefix });
+
+	indexer.index(new Collection[]{ collection });
     }
 }
