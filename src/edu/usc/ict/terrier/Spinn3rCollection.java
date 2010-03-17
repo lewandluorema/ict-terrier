@@ -8,6 +8,7 @@ import java.util.zip.GZIPInputStream;
 
 public class Spinn3rCollection implements Collection {
     private InputStream in;
+    private Document document;
     private boolean endOfStream = false;
 
     public Spinn3rCollection(String[] filenames) { 
@@ -26,13 +27,34 @@ public class Spinn3rCollection implements Collection {
     }
 
     public boolean endOfCollection() { return endOfStream; }
-
-    public Document getDocument() { 
-	return new Spinn3rDocument(new java.io.StringReader("Hey you"), new HashMap<String, String>()); 
-    }
+    public Document getDocument() { return document; }
 
     public boolean nextDocument() { 
-	return false; 
+	BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+	StringBuffer buffer = new StringBuffer();
+
+	try {
+	    String lastLine = reader.readLine();
+	    while (lastLine != null && !lastLine.equals("<item>")) 
+		lastLine = reader.readLine();
+
+	    if (lastLine == null) {
+		endOfStream = true;
+		return false;
+	    }
+
+	    buffer.append(lastLine + "\n");
+
+	    while (lastLine != null && !lastLine.equals("</item>")) {
+		lastLine = reader.readLine();
+		buffer.append(lastLine + "\n");
+	    }
+
+	    document = new Spinn3rDocument(buffer.toString());
+	    return true; 
+	}
+	catch (IOException e) { e.printStackTrace(); }
+	return false;
     }
 
     public void reset() { try { in.reset(); } catch (IOException e) { e.printStackTrace(); } }
