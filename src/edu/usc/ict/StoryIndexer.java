@@ -54,28 +54,27 @@ public class StoryIndexer {
     private Class<? extends Indexer> indexerClass;
 
     public StoryIndexer(String path, String prefix) throws ClassNotFoundException { 
-	this(path, prefix, defaultCollectionClassName, defaultIndexerClassName); 
+	this(path, prefix, defaultIndexerClassName, defaultCollectionClassName); 
     }
 
-    public StoryIndexer(String path, String prefix, String collectionClassName, String indexerClassName) 
+    public StoryIndexer(String path, String prefix, String indexerClassName, String collectionClassName) 
 	throws ClassNotFoundException 
     { 
 	indexPath = path;  
 	indexPrefix = prefix;
-	collectionClass = Class.forName(collectionClassName).asSubclass(Collection.class);
 	indexerClass = Class.forName(indexerClassName).asSubclass(Indexer.class);
+	collectionClass = Class.forName(collectionClassName).asSubclass(Collection.class);
     }
 
-    public void process(String[] filenames) throws NoSuchMethodException, 
-	InstantiationException, IllegalAccessException, java.lang.reflect.InvocationTargetException 
+    public void process(String[] filenames) throws Exception
     {
-	Collection collection = collectionClass.getConstructor(new Class[]{ String[].class })
-	    .newInstance(new Object[]{ filenames });
-
 	System.setProperty("terrier.home", ".");
 	System.setProperty("terrier.var", ".");
 	Indexer indexer = indexerClass.getConstructor(new Class[]{ String.class, String.class })
 	    .newInstance(new Object[]{ indexPath, indexPrefix });
+
+	Collection collection = collectionClass.getConstructor(new Class[]{ String[].class })
+	    .newInstance(new Object[]{ filenames });
 
 	indexer.index(new Collection[]{ collection });
     }

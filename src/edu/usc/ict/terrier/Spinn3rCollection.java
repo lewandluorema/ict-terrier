@@ -2,18 +2,29 @@ package edu.usc.ict.terrier;
 
 import org.terrier.indexing.Collection;
 import org.terrier.indexing.Document;
+import java.util.*;
 
 public class Spinn3rCollection implements Collection {
-    private String[] filenames;
+    private ListIterator<String> listOfFiles;
+    private String openedFile;
 
     public Spinn3rCollection(String[] filenames) { 
-	this.filenames = filenames;
-	java.lang.System.err.println("Nevermind the TRECCollection, this is Spinn3rCollection!"); 
+	listOfFiles = Arrays.asList(filenames).listIterator();
+	openedFile = null;
     }
 
-    public boolean endOfCollection() { return false; }
-    public Document getDocument() { return new Spinn3rDocument(); }
-    public boolean nextDocument() { return false; }
+    public boolean endOfCollection() { 
+	return openedFile == null && !listOfFiles.hasNext();
+    }
+
+    public Document getDocument() { 
+	return new Spinn3rDocument(new java.io.StringReader("Hey you"), new HashMap<String, String>()); 
+    }
+
+    public boolean nextDocument() { 
+	return false; 
+    }
+
     public void reset() {}
     public void close() {}
 
