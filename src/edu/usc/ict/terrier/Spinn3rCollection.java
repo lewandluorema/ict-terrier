@@ -29,14 +29,16 @@ public class Spinn3rCollection implements Collection {
     public boolean endOfCollection() { return endOfStream; }
     public Document getDocument() { return document; }
 
+    //--------------------------------------------------
+    // The birth of mess
+    //-------------------------------------------------- 
     public boolean nextDocument() { 
 	BufferedReader reader = new BufferedReader(new InputStreamReader(in));
 	StringBuffer buffer = new StringBuffer();
 
 	try {
 	    String lastLine = reader.readLine();
-	    while (lastLine != null && !lastLine.equals("<item>")) 
-		lastLine = reader.readLine();
+	    while (lastLine != null && !lastLine.equals("<item>")) lastLine = reader.readLine();
 
 	    if (lastLine == null) {
 		endOfStream = true;
