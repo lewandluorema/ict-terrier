@@ -60,26 +60,17 @@ public class StorySearcher {
 		int[] docids = rs.getDocids();
 		double[] scores = rs.getScores();
 		String[] urls = rs.getMetaItems("url");
-		String[] texts = rs.getMetaItems("title");
+		String[] titles = rs.getMetaItems("title");
+		String[] texts = rs.getMetaItems("texts");
 
 		int size = Math.min(docids.length, 10);
 		for (int i = 0; i < size; ++i) {
 		    System.out.println(Integer.toString(docids[i]) + " " + Double.toString(scores[i]));
-		    System.out.println(urls[i]);
-		    System.out.println(texts[i]);
+		    if (urls != null) System.out.println(urls[i]);
+		    if (titles != null) System.out.println(titles[i]);
+		    if (texts != null) System.out.println(texts[i]);
 		}
-
-		//--------------------------------------------------
-		// String[] metaKeys = rs.getMetaKeys();
-		// for (String key: metaKeys) {
-		//     System.out.println(key + ": " + );
-		//-------------------------------------------------- 
 	    }
-	//--------------------------------------------------
-	//     // NOTE: Prefix defaults "ict"
-	//     StorySearcher searcher = new StorySearcher(cmd.getOptionValue("index", "index.unnamed"), "ict");
-	//     indexer.process(filenames);
-	//-------------------------------------------------- 
 	}
 	catch (ParseException e) { System.err.println("common-cli: " + e.getMessage()); }
 	catch (Exception e) { e.printStackTrace(); }
