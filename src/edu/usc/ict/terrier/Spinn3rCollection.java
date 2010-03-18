@@ -8,6 +8,7 @@ import java.util.zip.GZIPInputStream;
 
 public class Spinn3rCollection implements Collection {
     private InputStream in;
+    private BufferedReader reader;
     private Document document;
     private boolean endOfStream = false;
 
@@ -22,7 +23,12 @@ public class Spinn3rCollection implements Collection {
 	    catch (IOException e) { e.printStackTrace(); }
 	}
 
-	in = new SequenceInputStream(streams.elements());
+	try {
+	    in = new SequenceInputStream(streams.elements());
+	    reader = new BufferedReader(new InputStreamReader(in, "UTF-8"));
+	}
+	catch (Exception e) { e.printStackTrace(); }
+
 	nextDocument();
     }
 
@@ -33,24 +39,33 @@ public class Spinn3rCollection implements Collection {
     // The birth of mess
     //-------------------------------------------------- 
     public boolean nextDocument() { 
-	BufferedReader reader = new BufferedReader(new InputStreamReader(in));
 	StringBuffer buffer = new StringBuffer();
 
 	try {
-	    String lastLine = reader.readLine();
-	    while (lastLine != null && !lastLine.equals("<item>")) lastLine = reader.readLine();
+	    String line;
+	    while ((line = reader.readLine()) != null && !line.startsWith("<item>")) ;
 
-	    if (lastLine == null) {
-		endOfStream = true;
+	    if (line == null) {
+		System.err.println("* here");
+		//--------------------------------------------------
+		// endOfStream = true;
+		//-------------------------------------------------- 
 		return false;
 	    }
 
-	    buffer.append(lastLine + "\n");
+	    buffer.append(line + "\n");
+	    while ((line = reader.readLine()) != null && !line.startsWith("</item>"))
+		buffer.append(line + "\n");
 
-	    while (lastLine != null && !lastLine.equals("</item>")) {
-		lastLine = reader.readLine();
-		buffer.append(lastLine + "\n");
+	    if (line == null) {
+		System.err.println("* there");
+		//--------------------------------------------------
+		// endOfStream = true;
+		//-------------------------------------------------- 
+		return false;
 	    }
+
+	    buffer.append(line + "\n");
 
 	    document = new Spinn3rDocument(buffer.toString());
 	    return true; 
@@ -59,7 +74,10 @@ public class Spinn3rCollection implements Collection {
 	return false;
     }
 
-    public void reset() { try { in.reset(); } catch (IOException e) { e.printStackTrace(); } }
+    public void reset() { 
+	// try { in.reset(); } catch (IOException e) { e.printStackTrace(); } 
+    }
+
     public void close() {}
 
     // Arrrgh.  Why should I implement a deprecated method?
