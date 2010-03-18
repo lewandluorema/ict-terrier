@@ -48,7 +48,9 @@ public class StorySearcher {
 		SearchRequest srq = queryingManager.newSearchRequest("queryID0", query);
 		srq.addMatchingModel("Matching", "PL2");
 		srq.setControl("decorate", "on");
-		srq.setControl("summaries", "text");
+		//--------------------------------------------------
+		// srq.setControl("summaries", "text");
+		//-------------------------------------------------- 
 		queryingManager.runPreProcessing(srq);
 		queryingManager.runMatching(srq);
 		queryingManager.runPostProcessing(srq);
@@ -58,7 +60,7 @@ public class StorySearcher {
 		int[] docids = rs.getDocids();
 		double[] scores = rs.getScores();
 		String[] urls = rs.getMetaItems("url");
-		String[] texts = rs.getMetaItems("text");
+		String[] texts = rs.getMetaItems("title");
 
 		int size = Math.min(docids.length, 10);
 		for (int i = 0; i < size; ++i) {

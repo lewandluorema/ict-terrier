@@ -11,8 +11,6 @@ public class Spinn3rDocument implements Document {
     private Map<String, String> properties = new HashMap<String, String>();
     private Set<String> fields = new HashSet<String>();
     
-    private final static Pattern docnoPattern = Pattern.compile("<link>(.*?)</link>");
-    private final static Pattern sentencePattern = Pattern.compile("<dsentence>(.*?)</dsentence>");
     private String content;
 
     private static int docno = 0;
@@ -21,26 +19,30 @@ public class Spinn3rDocument implements Document {
 	reader = new StringReader(content);
 	StringBuffer text = new StringBuffer();
 
+	String title = "N/A";
+	String url = "N/A";
+
 	try {
 	    // NOTE: Work with the `reader' inside
 	    BufferedReader reader = new BufferedReader(new StringReader(content));
 	    String line;
 	    while ((line = reader.readLine()) != null) {
-		if (line.startsWith("<link>")) {
-		    Matcher m = docnoPattern.matcher(line);
-		    if (m.matches()) 
-			properties.put("url", line.substring(m.start(1), m.end(1)));
+		if (line.startsWith("<link>") && line.endsWith("</link>")) {
+		    url = line.substring(6, line.indexOf("</link>"));
 		}
-		else if (line.startsWith("<dsentence>")) {
-		    Matcher m = sentencePattern.matcher(line);
-		    if (m.matches()) 
-			text.append(line.substring(m.start(1), m.end(1)) + " \n");
+		else if (line.startsWith("<title>") && line.endsWith("</title>")) {
+		    title = line.substring(7, line.indexOf("</title>"));
+		}
+		else if (line.startsWith("<dsentence>") && line.endsWith("</dsentence>")) {
+		    text.append(line.substring(11, line.indexOf("</dsentence>")) + " \n");
 		}
 	    }
 	}
 	catch (IOException e) { e.printStackTrace(); }
 
 	// Set things up
+	properties.put("title", title);
+	properties.put("url", url);
 	properties.put("docno", Integer.toString(++docno));
 	properties.put("text", text.toString().toLowerCase());
 	iteratorOfTerms = Arrays.asList(text.toString().toLowerCase().split("\\s+")).listIterator();
@@ -52,7 +54,7 @@ public class Spinn3rDocument implements Document {
 
     public String getNextTerm() { 
 	String term = iteratorOfTerms.next(); 
-	return term.length() < 25? term: "";
+	return term.length() < 20? term: null;
     }
 
     public String getProperty(String name) { return properties.get(name); }
