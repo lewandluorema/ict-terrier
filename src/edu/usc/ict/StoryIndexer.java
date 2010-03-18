@@ -3,11 +3,7 @@ package edu.usc.ict;
 import org.apache.log4j.Logger;
 import org.apache.commons.cli.*;
 import org.terrier.indexing.*;
-//--------------------------------------------------
-// import org.terrier.utility.ApplicationSetup;
-//-------------------------------------------------- 
 import java.io.*;
-import java.util.zip.GZIPInputStream;
 
 public class StoryIndexer {
     public static void main(String[] args) {

@@ -4,7 +4,6 @@ import org.terrier.indexing.Collection;
 import org.terrier.indexing.Document;
 import java.io.*;
 import java.util.*;
-import java.util.zip.GZIPInputStream;
 
 public class Spinn3rCollection implements Collection {
     private InputStream in;
@@ -15,17 +14,16 @@ public class Spinn3rCollection implements Collection {
     public Spinn3rCollection(String[] filenames) { 
 	Vector<InputStream> streams = new Vector<InputStream>();
 	for (String filename: filenames) {
-	    try {
-		streams.add(filename.endsWith(".gz")? 
-		    new GZIPInputStream(new FileInputStream(filename)): new FileInputStream(filename));
-	    }
+	    try { streams.add(new FileInputStream(filename)); }
 	    catch (FileNotFoundException e) {}
 	    catch (IOException e) { e.printStackTrace(); }
 	}
 
+	if (streams.size() == 0) streams.add(System.in);
+
 	try {
 	    in = new SequenceInputStream(streams.elements());
-	    reader = new BufferedReader(new InputStreamReader(in, "UTF-8"));
+	    reader = new BufferedReader(new InputStreamReader(in));
 	}
 	catch (Exception e) { e.printStackTrace(); }
 
@@ -46,10 +44,7 @@ public class Spinn3rCollection implements Collection {
 	    while ((line = reader.readLine()) != null && !line.startsWith("<item>")) ;
 
 	    if (line == null) {
-		System.err.println("* here");
-		//--------------------------------------------------
-		// endOfStream = true;
-		//-------------------------------------------------- 
+		endOfStream = true;
 		return false;
 	    }
 
@@ -58,10 +53,7 @@ public class Spinn3rCollection implements Collection {
 		buffer.append(line + "\n");
 
 	    if (line == null) {
-		System.err.println("* there");
-		//--------------------------------------------------
-		// endOfStream = true;
-		//-------------------------------------------------- 
+		endOfStream = true;
 		return false;
 	    }
 

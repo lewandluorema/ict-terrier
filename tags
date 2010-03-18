@@ -11,13 +11,17 @@ Spinn3rDocument	src/edu/usc/ict/terrier/Spinn3rDocument.java	/^public class Spin
 StoryIndexer	src/edu/usc/ict/StoryIndexer.java	/^    public StoryIndexer(String path, String prefix) throws ClassNotFoundException { $/;"	m	class:StoryIndexer
 StoryIndexer	src/edu/usc/ict/StoryIndexer.java	/^    public StoryIndexer(String path, String prefix, String indexerClassName, String collectionClassName) $/;"	m	class:StoryIndexer
 StoryIndexer	src/edu/usc/ict/StoryIndexer.java	/^public class StoryIndexer {$/;"	c
+StorySearcher	src/edu/usc/ict/StorySearcher.java	/^public class StorySearcher {$/;"	c
 close	src/edu/usc/ict/terrier/Spinn3rCollection.java	/^    public void close() {}$/;"	m	class:Spinn3rCollection
 collectionClass	src/edu/usc/ict/StoryIndexer.java	/^    private Class<? extends Collection> collectionClass; $/;"	f	class:StoryIndexer	file:
 content	src/edu/usc/ict/terrier/Spinn3rDocument.java	/^    private String content;$/;"	f	class:Spinn3rDocument	file:
 defaultCollectionClassName	src/edu/usc/ict/StoryIndexer.java	/^    public static final String defaultCollectionClassName = "edu.usc.ict.terrier.Spinn3rCollection";$/;"	f	class:StoryIndexer
 defaultIndexerClassName	src/edu/usc/ict/StoryIndexer.java	/^    public static final String defaultIndexerClassName = "org.terrier.indexing.BasicSinglePassIndexer";$/;"	f	class:StoryIndexer
+docno	src/edu/usc/ict/terrier/Spinn3rDocument.java	/^    private static int docno = 0;$/;"	f	class:Spinn3rDocument	file:
+docnoPattern	src/edu/usc/ict/terrier/Spinn3rDocument.java	/^    private final static Pattern docnoPattern = Pattern.compile("<link>(.*?)<\/link>");$/;"	f	class:Spinn3rDocument	file:
 document	src/edu/usc/ict/terrier/Spinn3rCollection.java	/^    private Document document;$/;"	f	class:Spinn3rCollection	file:
 edu.usc.ict	src/edu/usc/ict/StoryIndexer.java	/^package edu.usc.ict;$/;"	p
+edu.usc.ict	src/edu/usc/ict/StorySearcher.java	/^package edu.usc.ict;$/;"	p
 edu.usc.ict.terrier	src/edu/usc/ict/terrier/Spinn3rCollection.java	/^package edu.usc.ict.terrier;$/;"	p
 edu.usc.ict.terrier	src/edu/usc/ict/terrier/Spinn3rDocument.java	/^package edu.usc.ict.terrier;$/;"	p
 endOfCollection	src/edu/usc/ict/terrier/Spinn3rCollection.java	/^    public boolean endOfCollection() { return endOfStream; }$/;"	m	class:Spinn3rCollection
@@ -28,9 +32,9 @@ getAllProperties	src/edu/usc/ict/terrier/Spinn3rDocument.java	/^    public Map<S
 getDocid	src/edu/usc/ict/terrier/Spinn3rCollection.java	/^    @Deprecated public String getDocid() { return null; }$/;"	m	class:Spinn3rCollection
 getDocument	src/edu/usc/ict/terrier/Spinn3rCollection.java	/^    public Document getDocument() { return document; }$/;"	m	class:Spinn3rCollection
 getFields	src/edu/usc/ict/terrier/Spinn3rDocument.java	/^    public Set<String> getFields() { return fields; }$/;"	m	class:Spinn3rDocument
-getNextTerm	src/edu/usc/ict/terrier/Spinn3rDocument.java	/^    public String getNextTerm() { return Integer.toString(iteratorOfTerms.next().length()); }$/;"	m	class:Spinn3rDocument
+getNextTerm	src/edu/usc/ict/terrier/Spinn3rDocument.java	/^    public String getNextTerm() { $/;"	m	class:Spinn3rDocument
 getProperty	src/edu/usc/ict/terrier/Spinn3rDocument.java	/^    public String getProperty(String name) { return properties.get(name); }$/;"	m	class:Spinn3rDocument
-getReader	src/edu/usc/ict/terrier/Spinn3rDocument.java	/^    public Reader getReader() { return new StringReader(content); }$/;"	m	class:Spinn3rDocument
+getReader	src/edu/usc/ict/terrier/Spinn3rDocument.java	/^    public Reader getReader() { return null; }$/;"	m	class:Spinn3rDocument
 in	src/edu/usc/ict/terrier/Spinn3rCollection.java	/^    private InputStream in;$/;"	f	class:Spinn3rCollection	file:
 indexPath	src/edu/usc/ict/StoryIndexer.java	/^    private String indexPath;$/;"	f	class:StoryIndexer	file:
 indexPrefix	src/edu/usc/ict/StoryIndexer.java	/^    private String indexPrefix;$/;"	f	class:StoryIndexer	file:
@@ -40,4 +44,7 @@ main	src/edu/usc/ict/StoryIndexer.java	/^    public static void main(String[] ar
 nextDocument	src/edu/usc/ict/terrier/Spinn3rCollection.java	/^    public boolean nextDocument() { $/;"	m	class:Spinn3rCollection
 process	src/edu/usc/ict/StoryIndexer.java	/^    public void process(String[] filenames) throws Exception$/;"	m	class:StoryIndexer
 properties	src/edu/usc/ict/terrier/Spinn3rDocument.java	/^    private Map<String, String> properties = new HashMap<String, String>();$/;"	f	class:Spinn3rDocument	file:
-reset	src/edu/usc/ict/terrier/Spinn3rCollection.java	/^    public void reset() { try { in.reset(); } catch (IOException e) { e.printStackTrace(); } }$/;"	m	class:Spinn3rCollection
+reader	src/edu/usc/ict/terrier/Spinn3rCollection.java	/^    private BufferedReader reader;$/;"	f	class:Spinn3rCollection	file:
+reader	src/edu/usc/ict/terrier/Spinn3rDocument.java	/^    private Reader reader;$/;"	f	class:Spinn3rDocument	file:
+reset	src/edu/usc/ict/terrier/Spinn3rCollection.java	/^    public void reset() { $/;"	m	class:Spinn3rCollection
+sentencePattern	src/edu/usc/ict/terrier/Spinn3rDocument.java	/^    private final static Pattern sentencePattern = Pattern.compile("<dsentence>(.*?)<\/dsentence>");$/;"	f	class:Spinn3rDocument	file:

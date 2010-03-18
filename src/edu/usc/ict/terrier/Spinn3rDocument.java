@@ -15,10 +15,11 @@ public class Spinn3rDocument implements Document {
     private final static Pattern sentencePattern = Pattern.compile("<dsentence>(.*?)</dsentence>");
     private String content;
 
+    private static int docno = 0;
+
     public Spinn3rDocument(String content) {
 	reader = new StringReader(content);
 	StringBuffer text = new StringBuffer();
-	text.append("stuff\n");
 
 	try {
 	    // NOTE: Work with the `reader' inside
@@ -28,23 +29,21 @@ public class Spinn3rDocument implements Document {
 		if (line.startsWith("<link>")) {
 		    Matcher m = docnoPattern.matcher(line);
 		    if (m.matches()) 
-			properties.put("docno", line.substring(m.start(1), Math.min(m.end(1), m.start(1) + 60)));
-
-		    System.err.println(line.substring(m.start(1), m.end(1)));
+			properties.put("url", line.substring(m.start(1), m.end(1)));
 		}
-		//--------------------------------------------------
-		// else if (line.startsWith("<dsentence>")) {
-		//     Matcher m = sentencePattern.matcher(line);
-		//     if (m.matches()) 
-		// 	text.append(line.substring(m.start(1), m.end(1)) + "\n\n");
-		// }
-		//-------------------------------------------------- 
+		else if (line.startsWith("<dsentence>")) {
+		    Matcher m = sentencePattern.matcher(line);
+		    if (m.matches()) 
+			text.append(line.substring(m.start(1), m.end(1)) + " \n");
+		}
 	    }
 	}
 	catch (IOException e) { e.printStackTrace(); }
 
 	// Set things up
-	iteratorOfTerms = Arrays.asList(text.toString().split("\\s+")).listIterator();
+	properties.put("docno", Integer.toString(++docno));
+	properties.put("text", text.toString().toLowerCase());
+	iteratorOfTerms = Arrays.asList(text.toString().toLowerCase().split("\\s+")).listIterator();
     }
 
     public boolean endOfDocument() { return !iteratorOfTerms.hasNext(); }
@@ -53,7 +52,7 @@ public class Spinn3rDocument implements Document {
 
     public String getNextTerm() { 
 	String term = iteratorOfTerms.next(); 
-	return term.length() < 20? term: "";
+	return term.length() < 25? term: "";
     }
 
     public String getProperty(String name) { return properties.get(name); }
