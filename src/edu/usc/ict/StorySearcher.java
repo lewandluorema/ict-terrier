@@ -65,8 +65,7 @@ public class StorySearcher {
 	try {
 	    writer = XMLOutputFactory.newInstance().createXMLStreamWriter(sw);
 	    writer.writeStartDocument("UTF-8", "1.0");
-	    writer.writeStartElement("items");
-
+	    
 	    if (query != null && query.length() > 0) {
 		SearchRequest srq = queryingManager.newSearchRequest("queryID0", query);
 		srq.addMatchingModel("Matching", "PL2");
@@ -76,6 +75,10 @@ public class StorySearcher {
 		queryingManager.runPostProcessing(srq);
 		queryingManager.runPostFilters(srq);
 		ResultSet rs = srq.getResultSet();
+
+		writer.writeStartElement("items");
+		writer.writeAttribute("size", Integer.toString(rs.getResultSize()));
+		writer.writeAttribute("exactSize", Integer.toString(rs.getExactResultSize()));
 
 		int[] docids = rs.getDocids();
 		double[] scores = rs.getScores();
@@ -102,7 +105,7 @@ public class StorySearcher {
 		    if (urls != null) {
 			try {
 			    writer.writeStartElement("url");
-			    writer.writeCData(urls[i].replace('\0', ' '));
+			    writer.writeCData(urls[i].replace("]]>", "").replace("\0", ""));
 			} finally { writer.writeEndElement(); }
 		    }
 
@@ -110,7 +113,7 @@ public class StorySearcher {
 		    if (titles != null) {
 			try {
 			    writer.writeStartElement("title");
-			    writer.writeCData(titles[i].replace('\0', ' '));
+			    writer.writeCData(titles[i].replace("]]>", "").replace("\0", ""));
 			} finally { writer.writeEndElement(); }
 		    }
 
@@ -118,15 +121,18 @@ public class StorySearcher {
 		    if (texts != null) {
 			try {
 			    writer.writeStartElement("text");
-			    writer.writeCData(texts[i]);
+			    writer.writeCData(texts[i].replace("]]>", "").replace("\0", ""));
 			} finally { writer.writeEndElement(); }
 		    }
 
 		    writer.writeEndElement();
 		}
-	    }
 
-	    writer.writeEndElement();
+		writer.writeEndElement();
+	    }
+	    else {
+		writer.writeEmptyElement("items");
+	    }
 	}
 	catch (XMLStreamException e) { e.printStackTrace(); }
 	finally { 
