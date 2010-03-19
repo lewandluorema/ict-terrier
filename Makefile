@@ -28,6 +28,9 @@ BUNDLE = ict-terrier.jar
 
 classes: $(SRC:.java=.class)
 
+tags:
+	ctags -R src
+
 jar: $(BUNDLE)
 $(BUNDLE): $(SRC:.java=.class)
 	(cd src; $(JAR) cvfM $(BUNDLE) $(shell cd src; find -name '*.class'))

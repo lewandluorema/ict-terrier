@@ -57,8 +57,6 @@ public class StoryServer {
 
 class SearchHandler implements HttpHandler {
     public void handle(HttpExchange exchange) {
-	System.err.println(exchange.getRequestURI().toString());
-
 	int rCode = 200;
 
 	Headers headers = exchange.getResponseHeaders();
@@ -81,7 +79,7 @@ class SearchHandler implements HttpHandler {
 
 class StatsHandler implements HttpHandler {
     public void handle(HttpExchange exchange) {
-	try { exchange.sendResponseHeaders(404, 0l); }
+	try { exchange.sendResponseHeaders(200, 0l); }
 	catch (IOException e) {}
 	finally { exchange.close(); }
     }
