@@ -34,4 +34,4 @@ $(BUNDLE): $(SRC:.java=.class)
 	mv src/$(BUNDLE) .
 
 clean:
-	rm -f $(SRC:.java=.class)
+	rm -f $(shell find src -name '*.class')

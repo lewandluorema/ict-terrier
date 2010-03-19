@@ -17,10 +17,11 @@ public class Spinn3rDocument implements Document {
 
     public Spinn3rDocument(String content) {
 	reader = new StringReader(content);
-	StringBuffer text = new StringBuffer();
+	StringBuffer buffer = new StringBuffer();
 
 	String title = "N/A";
 	String url = "N/A";
+	String text = "N/A";
 
 	try {
 	    // NOTE: Work with the `reader' inside
@@ -34,18 +35,19 @@ public class Spinn3rDocument implements Document {
 		    title = line.substring(7, line.indexOf("</title>"));
 		}
 		else if (line.startsWith("<dsentence>") && line.endsWith("</dsentence>")) {
-		    text.append(line.substring(11, line.indexOf("</dsentence>")) + " \n");
+		    buffer.append(line.substring(11, line.indexOf("</dsentence>")) + " \n");
 		}
 	    }
 	}
 	catch (IOException e) { e.printStackTrace(); }
 
 	// Set things up
-	properties.put("title", title);
-	properties.put("url", url);
+	text = buffer.toString();
+	iteratorOfTerms = Arrays.asList(text.toLowerCase().split("\\s+")).listIterator();
 	properties.put("docno", Integer.toString(++docno));
-	properties.put("text", text.toString().toLowerCase());
-	iteratorOfTerms = Arrays.asList(text.toString().toLowerCase().split("\\s+")).listIterator();
+	properties.put("title", title.length() > 256? title.substring(0, 256): title);
+	properties.put("url", url.length() > 256? url.substring(0, 256): url);
+	properties.put("text", text.length() > 512? text.substring(0, 512): text);
     }
 
     public boolean endOfDocument() { return !iteratorOfTerms.hasNext(); }

@@ -48,9 +48,6 @@ public class StorySearcher {
 		SearchRequest srq = queryingManager.newSearchRequest("queryID0", query);
 		srq.addMatchingModel("Matching", "PL2");
 		srq.setControl("decorate", "on");
-		//--------------------------------------------------
-		// srq.setControl("summaries", "text");
-		//-------------------------------------------------- 
 		queryingManager.runPreProcessing(srq);
 		queryingManager.runMatching(srq);
 		queryingManager.runPostProcessing(srq);
@@ -61,14 +58,17 @@ public class StorySearcher {
 		double[] scores = rs.getScores();
 		String[] urls = rs.getMetaItems("url");
 		String[] titles = rs.getMetaItems("title");
-		String[] texts = rs.getMetaItems("texts");
+		String[] texts = rs.getMetaItems("text");
+		String[] xs = rs.getMetaItems("x");
 
 		int size = Math.min(docids.length, 10);
 		for (int i = 0; i < size; ++i) {
+		    System.out.println("---------------------------------------------------------");
 		    System.out.println(Integer.toString(docids[i]) + " " + Double.toString(scores[i]));
-		    if (urls != null) System.out.println(urls[i]);
-		    if (titles != null) System.out.println(titles[i]);
-		    if (texts != null) System.out.println(texts[i]);
+		    if (xs != null) System.out.println(xs[i]);
+		    if (urls != null) System.out.println("url: " + urls[i]);
+		    if (titles != null) System.out.println("title: " + titles[i]);
+		    if (texts != null) System.out.println("text: " + texts[i]);
 		}
 	    }
 	}
