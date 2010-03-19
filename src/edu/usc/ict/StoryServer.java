@@ -3,7 +3,7 @@ package edu.usc.ict;
 import org.apache.log4j.Logger;
 import org.apache.commons.cli.*;
 import java.io.*;
-import java.net.InetSocketAddress;
+import java.net.*;
 import com.sun.net.httpserver.*;
 
 public class StoryServer {
@@ -36,42 +36,51 @@ public class StoryServer {
 
 	    // NOTE: Prefix defaults "ict"
 	    StoryServer server = new StoryServer(cmd.getOptionValue("index", "index.unnamed"), "ict");
+	    server.start();
 	}
 	catch (ParseException e) { System.err.println("common-cli: " + e.getMessage()); }
 	catch (Exception e) { e.printStackTrace(); }
     }
 
+    private HttpServer httpServer;
+
     public StoryServer(String path, String prefix) {
-	InetSocketAddress addr = new InetSocketAddress(8080);
+	StorySearcher searcher = new StorySearcher(path, prefix);
 
 	try {
-	    HttpServer httpServer = HttpServer.create(addr, 0);
-	    httpServer.createContext("/search", new SearchHandler());
-	    httpServer.createContext("/stats", new StatsHandler());
-
-	    httpServer.start();
+	    httpServer = HttpServer.create(new InetSocketAddress(8080), 0);
+	    httpServer.createContext("/search/", new SearchHandler(searcher));
+	    httpServer.createContext("/stats/", new StatsHandler());
 	}
 	catch (IOException e) { e.printStackTrace(); }
     }
+
+    public void start() { httpServer.start(); }
+    public void stop(int delay) { httpServer.stop(delay); }
 }
 
 class SearchHandler implements HttpHandler {
+    private StorySearcher searcher;
+    public SearchHandler(StorySearcher searcher) { this.searcher = searcher; }
+
     public void handle(HttpExchange exchange) {
 	int rCode = 200;
 
 	Headers headers = exchange.getResponseHeaders();
-	headers.add("Content-Type", "text/html; charset=ISO-8859-1");
+	headers.add("Content-Type", "text/xml; charset=UTF-8");
 
-	String message = "<html><head><title>It works!</title></head><body><h3>It works!</h3><p>" 
-	    + exchange.getRequestURI().toString() + "</p></body></html>";
+	try {
+	    String path = exchange.getRequestURI().getPath();
+	    String basePath = exchange.getHttpContext().getPath();
+	    String query = URLDecoder.decode(path.substring(basePath.length()), "UTF-8");
+	    String message = searcher.process(query);
 
-	try { 
 	    exchange.sendResponseHeaders(rCode, 0); 
-
-	    OutputStream out = exchange.getResponseBody();
-	    PrintWriter writer = new PrintWriter(out);
+	    PrintWriter writer = new PrintWriter(exchange.getResponseBody(), true);
 	    writer.print(message);
+	    writer.close();
 	}
+	catch (UnsupportedEncodingException e) { }
 	catch (IOException e) { }
 	finally { exchange.close(); }
     }

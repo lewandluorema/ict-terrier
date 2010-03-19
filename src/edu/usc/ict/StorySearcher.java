@@ -7,6 +7,7 @@ import org.terrier.querying.Manager;
 import org.terrier.querying.SearchRequest;
 import org.terrier.structures.Index;
 import java.io.*;
+import javax.xml.stream.*;
 
 public class StorySearcher {
     public static void main(String[] args) {
@@ -41,7 +42,7 @@ public class StorySearcher {
 	    BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 	    String query;
 	    while ((query = br.readLine()) != null) 
-		searcher.process(query, System.out);
+		System.out.println(searcher.process(query));
 	}
 	catch (ParseException e) { System.err.println("common-cli: " + e.getMessage()); }
 	catch (Exception e) { e.printStackTrace(); }
@@ -57,33 +58,88 @@ public class StorySearcher {
 	queryingManager = new Manager(index);
     }
 
-    public void process(String query, OutputStream out) {
-	PrintWriter writer = new PrintWriter(out);
+    public String process(String query) {
+	StringWriter sw = new StringWriter();
+	XMLStreamWriter writer = null;
 
-	SearchRequest srq = queryingManager.newSearchRequest("queryID0", query);
-	srq.addMatchingModel("Matching", "PL2");
-	srq.setControl("decorate", "on");
-	queryingManager.runPreProcessing(srq);
-	queryingManager.runMatching(srq);
-	queryingManager.runPostProcessing(srq);
-	queryingManager.runPostFilters(srq);
-	ResultSet rs = srq.getResultSet();
+	try {
+	    writer = XMLOutputFactory.newInstance().createXMLStreamWriter(sw);
+	    writer.writeStartDocument("UTF-8", "1.0");
+	    writer.writeStartElement("items");
 
-	int[] docids = rs.getDocids();
-	double[] scores = rs.getScores();
-	String[] urls = rs.getMetaItems("url");
-	String[] titles = rs.getMetaItems("title");
-	String[] texts = rs.getMetaItems("text");
-	String[] xs = rs.getMetaItems("x");
+	    if (query != null && query.length() > 0) {
+		SearchRequest srq = queryingManager.newSearchRequest("queryID0", query);
+		srq.addMatchingModel("Matching", "PL2");
+		srq.setControl("decorate", "on");
+		queryingManager.runPreProcessing(srq);
+		queryingManager.runMatching(srq);
+		queryingManager.runPostProcessing(srq);
+		queryingManager.runPostFilters(srq);
+		ResultSet rs = srq.getResultSet();
 
-	int size = Math.min(docids.length, 10);
-	for (int i = 0; i < size; ++i) {
-	    writer.println("---------------------------------------------------------");
-	    writer.println(Integer.toString(docids[i]) + " " + Double.toString(scores[i]));
-	    if (xs != null) writer.println(xs[i]);
-	    if (urls != null) writer.println("url: " + urls[i]);
-	    if (titles != null) writer.println("title: " + titles[i]);
-	    if (texts != null) writer.println("text: " + texts[i]);
+		int[] docids = rs.getDocids();
+		double[] scores = rs.getScores();
+		String[] urls = rs.getMetaItems("url");
+		String[] titles = rs.getMetaItems("title");
+		String[] texts = rs.getMetaItems("text");
+
+		for (int i = 0; i < docids.length; ++i) {
+		    writer.writeStartElement("item");
+
+		    try {
+			// docno
+			writer.writeStartElement("docno");
+			writer.writeCharacters(Integer.toString(docids[i]));
+		    } finally { writer.writeEndElement(); }
+
+		    try {
+			// score
+			writer.writeStartElement("score");
+			writer.writeCharacters(Double.toString(scores[i]));
+		    } finally { writer.writeEndElement(); }
+
+		    // url
+		    if (urls != null) {
+			try {
+			    writer.writeStartElement("url");
+			    writer.writeCData(urls[i].replace('\0', ' '));
+			} finally { writer.writeEndElement(); }
+		    }
+
+		    // title
+		    if (titles != null) {
+			try {
+			    writer.writeStartElement("title");
+			    writer.writeCData(titles[i].replace('\0', ' '));
+			} finally { writer.writeEndElement(); }
+		    }
+
+		    // text
+		    if (texts != null) {
+			try {
+			    writer.writeStartElement("text");
+			    writer.writeCData(texts[i]);
+			} finally { writer.writeEndElement(); }
+		    }
+
+		    writer.writeEndElement();
+		}
+	    }
+
+	    writer.writeEndElement();
 	}
+	catch (XMLStreamException e) { e.printStackTrace(); }
+	finally { 
+
+	    try { 
+		writer.writeEndDocument();
+		writer.flush(); 
+		writer.close(); 
+	    }
+	    catch (XMLStreamException e) {}
+	    finally {}
+	}
+
+	return sw.toString();
     }
 }

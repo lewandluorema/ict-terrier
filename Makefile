@@ -24,14 +24,14 @@ BUNDLE = ict-terrier.jar
 .java.class:
 	$(JC) $(JFLAGS) $*.java
 
-.PHONY: classes jar clean
+.PHONY: classes jar clean all
 
-classes: $(SRC:.java=.class)
-
+all: tags jar
 tags:
 	ctags -R src
 
 jar: $(BUNDLE)
+
 $(BUNDLE): $(SRC:.java=.class)
 	(cd src; $(JAR) cvfM $(BUNDLE) $(shell cd src; find -name '*.class'))
 	mv src/$(BUNDLE) .
