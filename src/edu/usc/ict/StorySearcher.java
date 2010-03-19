@@ -136,14 +136,12 @@ public class StorySearcher {
 	}
 	catch (XMLStreamException e) { e.printStackTrace(); }
 	finally { 
-
 	    try { 
 		writer.writeEndDocument();
 		writer.flush(); 
 		writer.close(); 
 	    }
 	    catch (XMLStreamException e) {}
-	    finally {}
 	}
 
 	return sw.toString();

@@ -76,12 +76,13 @@ class SearchHandler implements HttpHandler {
 	    String message = searcher.process(query);
 
 	    exchange.sendResponseHeaders(rCode, 0); 
-	    PrintWriter writer = new PrintWriter(exchange.getResponseBody(), true);
+	    PrintWriter writer = new PrintWriter(exchange.getResponseBody());
 	    writer.print(message);
 	    writer.close();
+	    System.err.println(path + " " + message.length());
 	}
 	catch (UnsupportedEncodingException e) { }
-	catch (IOException e) { }
+	catch (IOException e) { e.printStackTrace(); }
 	finally { exchange.close(); }
     }
 }
