@@ -12,7 +12,6 @@ public class StoryIndexer {
 	//-------------------------------------------------- 
 	Option[] optionArray = {
 	    OptionBuilder.withLongOpt("help").withDescription("Show this help screen").create(),
-	    OptionBuilder.withLongOpt("verbose").withDescription("Show verbose output").create(),
 	    OptionBuilder.withLongOpt("index").withArgName("path").hasArgs(1).withDescription("Path to the index").create(),
 	};
 

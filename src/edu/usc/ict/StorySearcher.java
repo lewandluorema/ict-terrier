@@ -10,44 +10,6 @@ import java.io.*;
 import javax.xml.stream.*;
 
 public class StorySearcher {
-    public static void main(String[] args) {
-	//--------------------------------------------------
-	// CLI stuff
-	//-------------------------------------------------- 
-	Option[] optionArray = {
-	    OptionBuilder.withLongOpt("help").withDescription("Show this help screen").create(),
-	    OptionBuilder.withLongOpt("verbose").withDescription("Show verbose output").create(),
-	    OptionBuilder.withLongOpt("index").withArgName("path").hasArgs(1).withDescription("Path to the index").create(),
-	};
-
-	Options options = new Options();
-	for (Option o: optionArray) options.addOption(o);
-
-	CommandLineParser parser = new GnuParser();
-
-	try {
-	    CommandLine cmd = parser.parse(options, args);
-	    String[] filenames = cmd.getArgs();
-
-	    if (cmd.hasOption("help")) {
-		HelpFormatter formatter = new HelpFormatter();
-		formatter.printHelp("StorySearcher [options..] file..", options);
-		return;
-	    }
-
-	    if (!cmd.hasOption("index")) throw new MissingOptionException("Missing option --index");
-
-	    StorySearcher searcher = new StorySearcher(cmd.getOptionValue("index"), "ict");
-
-	    BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-	    String query;
-	    while ((query = br.readLine()) != null) 
-		System.out.println(searcher.process(query));
-	}
-	catch (ParseException e) { System.err.println("common-cli: " + e.getMessage()); }
-	catch (Exception e) { e.printStackTrace(); }
-    }
-
     private Manager queryingManager;
 
     public StorySearcher(String path, String prefix) {

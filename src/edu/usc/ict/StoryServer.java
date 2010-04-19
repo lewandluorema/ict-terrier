@@ -13,8 +13,10 @@ public class StoryServer {
 	//-------------------------------------------------- 
 	Option[] optionArray = {
 	    OptionBuilder.withLongOpt("help").withDescription("Show this help screen").create(),
-	    OptionBuilder.withLongOpt("verbose").withDescription("Show verbose output").create(),
-	    OptionBuilder.withLongOpt("index").withArgName("path").hasArgs(1).withDescription("Path to the index").create(),
+	    OptionBuilder.withLongOpt("index").withArgName("path").hasArgs(1).
+		withDescription("Path to the index").create(),
+	    OptionBuilder.withLongOpt("port").withArgName("number").hasArgs(1).
+		withDescription("Port to listen").create(),
 	};
 
 	Options options = new Options();
@@ -33,9 +35,11 @@ public class StoryServer {
 	    }
 
 	    if (!cmd.hasOption("index")) throw new MissingOptionException("Missing option --index");
+	    if (!cmd.hasOption("port")) throw new MissingOptionException("Missing option --port");
 
 	    // NOTE: Prefix defaults "ict"
-	    StoryServer server = new StoryServer(cmd.getOptionValue("index", "index.unnamed"), "ict");
+	    StoryServer server = new StoryServer(cmd.getOptionValue("index", "index.unnamed"), "ict", 
+		Integer.parseInt(cmd.getOptionValue("port", "8080")));
 	    server.start();
 	}
 	catch (ParseException e) { System.err.println("common-cli: " + e.getMessage()); }
@@ -44,11 +48,11 @@ public class StoryServer {
 
     private HttpServer httpServer;
 
-    public StoryServer(String path, String prefix) {
+    public StoryServer(String path, String prefix, int port) {
 	StorySearcher searcher = new StorySearcher(path, prefix);
 
 	try {
-	    httpServer = HttpServer.create(new InetSocketAddress(8080), 0);
+	    httpServer = HttpServer.create(new InetSocketAddress(port), 0);
 	    httpServer.createContext("/search/", new SearchHandler(searcher));
 	    httpServer.createContext("/stats/", new StatsHandler());
 	}
