@@ -1,4 +1,4 @@
 #!/bin/sh
 
-java -Xmx200M -cp "ict-terrier.jar:`find lib -name '*.jar' | perl -e'print join(":", map { chomp; $_ } <>), "\n"'`" \
-    edu.usc.ict.StoryServer $*
+classpath="`find -name '*.jar' -print0 | xargs -0 perl -e'print join(":", @ARGV)'`"
+java -Xmx200M -cp "$classpath" edu.usc.ict.StoryServer $*
