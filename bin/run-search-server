@@ -1,4 +1,7 @@
 #!/bin/sh
 
-classpath="`find -name '*.jar' -print0 | xargs -0 perl -e'print join(":", @ARGV)'`"
-java -Xmx200M -cp "$classpath" edu.usc.ict.StoryServer $*
+jar="ict-terrier.jar lib/terrier-3.0-core.jar lib/log4j-1.2.15.jar lib/trove-2.0.2.jar lib/hadoop18.2-joined.jar lib/antlr.jar lib/commons-cli-1.2.jar"
+classpath="`/usr/bin/perl -e'print join(":", @ARGV)' $jar`"
+
+terrier_home=./terrier
+java -cp "$classpath" -Dterrier.home="$terrier_home" edu.usc.ict.StoryServer $*
