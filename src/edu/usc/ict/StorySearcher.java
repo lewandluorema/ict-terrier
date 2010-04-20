@@ -13,9 +13,6 @@ public class StorySearcher {
     private Manager queryingManager;
 
     public StorySearcher(String path, String prefix) {
-	System.setProperty("terrier.home", ".");
-	System.setProperty("terrier.var", ".");
-
 	Index index = Index.createIndex(path, prefix);
 	queryingManager = new Manager(index);
     }

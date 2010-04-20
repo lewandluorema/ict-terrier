@@ -63,8 +63,6 @@ public class StoryIndexer {
 
     public void process(String[] filenames) throws Exception
     {
-	System.setProperty("terrier.home", ".");
-	System.setProperty("terrier.var", ".");
 	Indexer indexer = indexerClass.getConstructor(new Class[]{ String.class, String.class })
 	    .newInstance(new Object[]{ indexPath, indexPrefix });
 
