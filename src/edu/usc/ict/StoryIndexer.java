@@ -26,7 +26,7 @@ public class StoryIndexer {
 
 	    if (cmd.hasOption("help")) {
 		HelpFormatter formatter = new HelpFormatter();
-		formatter.printHelp("StoryIndexer [options..] file..", options);
+		formatter.printHelp("StoryIndexer [options..] file..\n", options);
 		return;
 	    }
 
