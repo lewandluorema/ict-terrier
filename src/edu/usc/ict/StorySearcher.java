@@ -12,8 +12,16 @@ import javax.xml.stream.*;
 public class StorySearcher {
     private Manager queryingManager;
 
-    public StorySearcher(String path, String prefix) {
-	Index index = Index.createIndex(path, prefix);
+    public StorySearcher(String path, String prefix) throws Exception {
+	// Sanity check.  
+	//
+	// We need to be sure that 'path' is absolute and really exists as a directory
+	// -- Shameless copy from 'StoryIndexer.java'
+	File dir = new File(path);
+	if (!dir.exists()) dir.mkdir();
+	if (!dir.isDirectory()) throw new Exception(dir + " is not a directory");
+
+	Index index = Index.createIndex(dir.getAbsolutePath(), prefix);
 	queryingManager = new Manager(index);
     }
 

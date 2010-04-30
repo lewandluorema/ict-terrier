@@ -32,13 +32,8 @@ public class StoryIndexer {
 
 	    if (!cmd.hasOption("index")) throw new MissingOptionException("Missing option --index");
 
-	    // HACK: We need to be sure these value is an absolute path
-	    File indexDirectory = new File(cmd.getOptionValue("index", "index.unnamed"));
-	    if (!indexDirectory.exists()) indexDirectory.mkdir();
-	    if (!indexDirectory.isDirectory()) throw new Exception("Cannot mkdir: " + indexDirectory);
-
 	    // NOTE: Prefix defaults "ict"
-	    StoryIndexer indexer = new StoryIndexer(indexDirectory.getAbsolutePath(), "ict");
+	    StoryIndexer indexer = new StoryIndexer(cmd.getOptionValue("index", "index.unnamed"), "ict");
 	    indexer.process(filenames);
 	}
 	catch (ParseException e) { System.err.println("common-cli: " + e.getMessage()); }
@@ -53,14 +48,21 @@ public class StoryIndexer {
     private Class<? extends Collection> collectionClass; 
     private Class<? extends Indexer> indexerClass;
 
-    public StoryIndexer(String path, String prefix) throws ClassNotFoundException { 
+    public StoryIndexer(String path, String prefix) throws ClassNotFoundException, Exception { 
 	this(path, prefix, defaultIndexerClassName, defaultCollectionClassName); 
     }
 
     public StoryIndexer(String path, String prefix, String indexerClassName, String collectionClassName) 
-	throws ClassNotFoundException 
+	throws ClassNotFoundException, Exception
     { 
-	indexPath = path;  
+	// Sanity check.  
+	//
+	// We need to be sure that 'path' is absolute and really exists as a directory
+	File dir = new File(path);
+	if (!dir.exists()) dir.mkdir();
+	if (!dir.isDirectory()) throw new Exception(dir + " is not a directory");
+
+	indexPath = dir.getAbsolutePath();  
 	indexPrefix = prefix;
 	indexerClass = Class.forName(indexerClassName).asSubclass(Indexer.class);
 	collectionClass = Class.forName(collectionClassName).asSubclass(Collection.class);
