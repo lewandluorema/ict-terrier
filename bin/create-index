@@ -4,4 +4,4 @@ jar="ict-terrier.jar lib/terrier-3.0-core.jar lib/log4j-1.2.15.jar lib/trove-2.0
 classpath="`/usr/bin/perl -e'print join(":", @ARGV)' $jar`"
 
 terrier_home=./terrier
-exec java -cp "$classpath" -Dterrier.home="$terrier_home" edu.usc.ict.StoryIndexer $*
+exec /usr/bin/java -cp "$classpath" -Dterrier.home="$terrier_home" edu.usc.ict.StoryIndexer $*
