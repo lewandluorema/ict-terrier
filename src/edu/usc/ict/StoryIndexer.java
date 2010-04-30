@@ -33,10 +33,12 @@ public class StoryIndexer {
 	    if (!cmd.hasOption("index")) throw new MissingOptionException("Missing option --index");
 
 	    // HACK: We need to be sure these value is an absolute path
-	    String indexPath = new File(cmd.getOptionValue("index", "index.unnamed")).getAbsolutePath();
+	    File indexDirectory = new File(cmd.getOptionValue("index", "index.unnamed"));
+	    if (!indexDirectory.exists()) indexDirectory.mkdir();
+	    if (!indexDirectory.isDirectory()) throw new Exception("Cannot mkdir: " + indexDirectory);
 
 	    // NOTE: Prefix defaults "ict"
-	    StoryIndexer indexer = new StoryIndexer(indexPath, "ict");
+	    StoryIndexer indexer = new StoryIndexer(indexDirectory.getAbsolutePath(), "ict");
 	    indexer.process(filenames);
 	}
 	catch (ParseException e) { System.err.println("common-cli: " + e.getMessage()); }
