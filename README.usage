@@ -1,0 +1,66 @@
+== Installation ==
+
+1.  Download the source.  You need git installed so as to access the git repo.
+    To initialize a cloned repo, simply go:
+
+      git clone git://github.com/rueycheng/ict-terrier.git
+
+    After that, a sub-directory called `ict-terrier' is build under the current working directory.
+    This is where you do most of the work.  
+
+    Whenever you need to update the code from the upstream, do:
+
+      cd ict-terrier
+      git pull
+
+2.  Make sure you have these programs installed in order to get started.
+
+    JDK:
+    - /usr/bin/javac
+    - /usr/bin/java
+    - /usr/bin/jar
+  
+    Perl:
+    - /usr/bin/perl
+  
+    Misc.:
+    - /usr/bin/ctags (optional, if you want to use ctags with Vim)
+
+    If the pathes to these programs are different from the default setting, 
+    change them in the begining of the Makefile.
+
+3.  Run the make.  Simply do `make' in the ict-terrier sub-directory.
+
+== Use Case #1: Create an index ==
+
+Assume that you are in the `ict-terrier' sub-directory and you kept the story corpus 
+in a directory `allstory'.  Now we could build several indexes like this:
+
+  zcat allstory/allstory.2010-01-01.gz | bin/create-index --index one-day
+  zcat allstory/allstory.2010-01-*.gz | bin/create-index --index one-month
+  zcat allstory/allstory.2010-*.gz | bin/create-index --index one-year
+
+Note that you could replace the PATH (the argument of --index) with any relative/absolute path that points to
+a target index directory.  Expect 2 minutes for building up one-day snapshot.
+
+== Use Case #2: Run the server over a set of index ==
+
+Assume that you have these indexes built:
+
+  ict-terrier/one-day
+  ict-terrier/one-month
+  ict-terrier/one-year
+
+You can start one server for ALL these indexes all at once, like:
+
+  bin/run-search-server --port 4001 one-day one-month one-year &
+
+Or, you could start three servers each listening to one specific port:
+  
+  bin/run-search-server --port 4001 one-day &
+  bin/run-search-server --port 4002 one-day &
+  bin/run-search-server --port 4003 one-day &
+  
+ 
+
+That's all
