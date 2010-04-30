@@ -46,14 +46,13 @@ public class StoryServer {
 
     private HttpServer httpServer;
 
-    public StoryServer(String[] pathes, String prefix, int port) {
+    public StoryServer(String[] pathes, String prefix, int port) throws Exception {
 	try {
 	    logger.info("Launch the HTTP server at port " + port);
 	    httpServer = HttpServer.create(new InetSocketAddress(port), 0);
 
 	    for (String path: pathes) {
 		if (path.endsWith("/")) path = path.substring(0, path.lastIndexOf("/"));
-		if (path.lastIndexOf('/') == -1) throw new IOException();
 		String name = path.substring(path.lastIndexOf('/') + 1);
 		String context = "/search/" + name + "/";
 		
